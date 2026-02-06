@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production
+build/
+dist/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# iExec
+.secrets/
+deployed.json
+
+# Docker
+*.tar
+
+# Secrets & Keys
+*.pem
+*.key
+mnemonic.txt
+
+# Mobile specific
+*.apk
+*.ipa
+.expo/
+.expo-shared/
+
+# Package managers
+pnpm-lock.yaml
+bun.lockb
+
+# Mobile
+.expo/
+.expo-shared/
+
+# Temporary
+*.tmp
+.cache/
