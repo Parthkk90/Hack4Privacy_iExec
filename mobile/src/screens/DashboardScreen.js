@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f0f1e',
+    paddingBottom: 80,
   },
   portfolioCard: {
     backgroundColor: '#1a1a2e',
