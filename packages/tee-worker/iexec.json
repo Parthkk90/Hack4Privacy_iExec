@@ -1,0 +1,33 @@
+{
+  "description": "PrivateAlpha TEE Worker - Private Credit Scoring & Trading Signals",
+  "license": "MIT",
+  "author": "PrivateAlpha Team",
+  "social": {
+    "github": "https://github.com/yourusername/privatealpha"
+  },
+  "logo": {
+    "file": "logo.png"
+  },
+  "buyConf": {
+    "params": {
+      "IEXEC_ARGS": "--help"
+    },
+    "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "trust": 1,
+    "callback": "0x0000000000000000000000000000000000000000"
+  },
+  "app": {
+    "owner": "0xYOUR_WALLET_ADDRESS",
+    "name": "privatealpha-tee",
+    "type": "DOCKER",
+    "multiaddr": "registry.hub.docker.com/yourusername/privatealpha-tee:latest",
+    "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "mrenclave": {
+      "framework": "SCONE",
+      "version": "v5",
+      "entrypoint": "/app/credit-scorer",
+      "heapSize": 1073741824,
+      "fingerprint": ""
+    }
+  }
+}

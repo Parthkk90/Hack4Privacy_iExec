@@ -1,0 +1,29 @@
+[package]
+name = "privatealpha-tee"
+version = "1.0.0"
+authors = ["PrivateAlpha Team"]
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+hex = "0.4"
+aes-gcm = "0.10"
+ring = "0.17"
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+tokio = { version = "1.35", features = ["full"] }
+chrono = "0.4"
+
+[[bin]]
+name = "credit-scorer"
+path = "src/bin/credit_scorer.rs"
+
+[[bin]]
+name = "strategy-executor"
+path = "src/bin/strategy_executor.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
