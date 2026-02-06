@@ -1,0 +1,28 @@
+{
+  "description": "PrivateAlpha TEE Worker - Credit Scoring and Strategy Execution",
+  "license": "MIT",
+  "author": "PrivateAlpha Team",
+  "social": {
+    "website": "https://privatealpha.io"
+  },
+  "app": {
+    "owner": "0xYourWalletAddress",
+    "name": "privatealpha-worker",
+    "type": "DOCKER",
+    "multiaddr": "registry.hub.docker.com/yourusername/privatealpha-tee:latest",
+    "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "mrenclave": {
+      "framework": "SCONE",
+      "version": "v5",
+      "entrypoint": "/app/credit-scorer",
+      "heapSize": 1073741824,
+      "fingerprint": ""
+    }
+  },
+  "buy": {
+    "params": {
+      "iexec_args": "credit-score",
+      "iexec_input_files": []
+    }
+  }
+}

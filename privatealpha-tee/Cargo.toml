@@ -1,0 +1,34 @@
+[package]
+name = "privatealpha-tee"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ring = "0.17"
+aes-gcm = "0.10"
+base64 = "0.21"
+chrono = "0.4"
+hex = "0.4"
+sha2 = "0.10"
+rand = "0.8"
+
+# For HTTP requests
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+
+# For TEE attestation (SCONE specific)
+# Note: Replace with actual SCONE SDK when available
+# scone-sdk = { version = "..." }
+
+[lib]
+name = "privatealpha_tee"
+path = "src/lib.rs"
+
+[[bin]]
+name = "credit-scorer"
+path = "src/bin/credit_scorer_main.rs"
+
+[[bin]]
+name = "strategy-executor"
+path = "src/bin/strategy_executor_main.rs"
