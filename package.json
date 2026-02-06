@@ -1,0 +1,47 @@
+{
+  "name": "privatealpha-monorepo",
+  "version": "1.0.0",
+  "description": "PrivateAlpha - Decentralized Private Trading Platform",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:workspaces",
+    "install:workspaces": "npm install --workspaces",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "dev:contracts": "npm run node --workspace=packages/contracts",
+    "dev:backend": "npm run dev --workspace=packages/backend",
+    "dev:mobile": "npm run web --workspace=packages/mobile",
+    "deploy:testnet": "npm run deploy:testnet --workspace=packages/contracts",
+    "deploy:all": "npm run deploy:testnet && npm run deploy:iexec --workspace=packages/tee-worker"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/privatealpha.git"
+  },
+  "keywords": [
+    "defi",
+    "trading",
+    "tee",
+    "iexec",
+    "arbitrum",
+    "privacy",
+    "blockchain"
+  ],
+  "author": "PrivateAlpha Team",
+  "license": "MIT"
+}
