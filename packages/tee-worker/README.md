@@ -42,10 +42,10 @@ cargo build --release
 
 ```bash
 # Build Docker image
-docker build -t privatealpha-tee:latest .
+docker build -t PUREIS -tee:latest .
 
 # Test locally
-docker run --rm privatealpha-tee:latest /app/credit-scorer --help
+docker run --rm PUREIS -tee:latest /app/credit-scorer --help
 ```
 
 ## Deployment to iExec
@@ -54,11 +54,11 @@ docker run --rm privatealpha-tee:latest /app/credit-scorer --help
 
 ```bash
 # Build image
-docker build -t yourusername/privatealpha-tee:latest .
+docker build -t yourusername/PUREIS -tee:latest .
 
 # Push to Docker Hub
 docker login
-docker push yourusername/privatealpha-tee:latest
+docker push yourusername/PUREIS -tee:latest
 ```
 
 ### 2. Initialize iExec

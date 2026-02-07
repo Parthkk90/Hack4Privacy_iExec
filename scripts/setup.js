@@ -3,7 +3,7 @@ const hre = require("hardhat");
 async function main() {
   const addresses = require("../deployment-addresses.json");
 
-  console.log("🔧 Setting up PrivateAlpha contracts...\n");
+  console.log("🔧 Setting up PUREIS  contracts...\n");
 
   // Get contracts
   const creditScoreRegistry = await hre.ethers.getContractAt(

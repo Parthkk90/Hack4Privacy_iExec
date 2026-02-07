@@ -1,9 +1,9 @@
 #!/usr/bin/env pwsh
 
-# PrivateAlpha Setup Script
+# PUREIS  Setup Script
 # Automates initial project setup
 
-Write-Host "🚀 PrivateAlpha Setup Script" -ForegroundColor Cyan
+Write-Host "🚀 PUREIS  Setup Script" -ForegroundColor Cyan
 Write-Host "=============================" -ForegroundColor Cyan
 Write-Host ""
 

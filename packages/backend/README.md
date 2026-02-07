@@ -1,6 +1,6 @@
 # Backend API Package
 
-Node.js REST API for PrivateAlpha, orchestrating blockchain interactions and TEE computations.
+Node.js REST API for PUREIS , orchestrating blockchain interactions and TEE computations.
 
 ## Features
 

@@ -1,7 +1,7 @@
 [package]
-name = "privatealpha-tee"
+name = "PUREIS -tee"
 version = "1.0.0"
-authors = ["PrivateAlpha Team"]
+authors = ["PUREIS  Team"]
 edition = "2021"
 
 [dependencies]

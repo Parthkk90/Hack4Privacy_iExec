@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha - Confidential DeFi Analytics iApp
+ * PUREIS  - Confidential DeFi Analytics iApp
  * 
  * A privacy-first financial intelligence platform running in iExec TEE
  * 
@@ -26,7 +26,7 @@ import { calculatePortfolioRisk } from './utils/riskCalculator.js';
 import { processBulk, aggregateBulkResults } from './utils/bulkProcessor.js';
 
 const VERSION = '1.0.0';
-const APP_NAME = 'PrivateAlpha';
+const APP_NAME = 'PUREIS ';
 
 /**
  * Main entry point for the iApp

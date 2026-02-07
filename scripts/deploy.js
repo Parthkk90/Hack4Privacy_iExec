@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying PrivateAlpha contracts to Arbitrum Sepolia...\n");
+  console.log("🚀 Deploying PUREIS  contracts to Arbitrum Sepolia...\n");
 
   // Get deployer account
   const [deployer] = await hre.ethers.getSigners();

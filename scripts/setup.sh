@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# PrivateAlpha Setup Script for Unix/Linux/macOS
+# PUREIS  Setup Script for Unix/Linux/macOS
 
 set -e
 
-echo "🚀 PrivateAlpha Setup Script"
+echo "🚀 PUREIS  Setup Script"
 echo "============================="
 echo ""
 

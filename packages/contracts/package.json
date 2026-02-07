@@ -1,7 +1,7 @@
 {
-  "name": "@privatealpha/contracts",
+  "name": "@PUREIS /contracts",
   "version": "1.0.0",
-  "description": "Smart contracts for PrivateAlpha trading platform",
+  "description": "Smart contracts for PUREIS  trading platform",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
@@ -16,7 +16,7 @@
     "format": "prettier --write 'contracts/**/*.sol'"
   },
   "keywords": ["solidity", "ethereum", "smart-contracts", "defi"],
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",

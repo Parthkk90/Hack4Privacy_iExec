@@ -1,16 +1,16 @@
 {
-  "name": "@privatealpha/tee-worker",
+  "name": "@PUREIS /tee-worker",
   "version": "1.0.0",
   "description": "TEE workers for private computation",
   "scripts": {
     "build": "cargo build --release",
     "test": "cargo test",
     "clean": "cargo clean",
-    "docker:build": "docker build -t privatealpha-tee:latest .",
-    "docker:push": "docker push privatealpha-tee:latest",
+    "docker:build": "docker build -t PUREIS -tee:latest .",
+    "docker:push": "docker push PUREIS -tee:latest",
     "deploy:iexec": "npm run docker:build && npm run docker:push && iexec app deploy --chain arbitrum-sepolia"
   },
   "keywords": ["tee", "iexec", "rust", "privacy"],
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "license": "MIT"
 }

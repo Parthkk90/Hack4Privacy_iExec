@@ -1,10 +1,10 @@
-use privatealpha_tee::compute_credit_score;
+use PUREIS _tee::compute_credit_score;
 use std::env;
 use std::fs;
 use std::io::{self, Read};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔒 PrivateAlpha Credit Scorer - TEE Worker");
+    println!("🔒 PUREIS  Credit Scorer - TEE Worker");
     println!("Running in secure enclave...\n");
 
     // Read input from args or stdin

@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha Risk Calculator
+ * PUREIS  Risk Calculator
  * Monte Carlo simulation for Value at Risk (VaR) and portfolio risk metrics
  * All computations happen inside the TEE - portfolio data remains private
  */

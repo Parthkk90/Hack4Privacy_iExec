@@ -9,7 +9,7 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PrivateAlpha</Text>
+      <Text style={styles.title}>PUREIS </Text>
       <Text style={styles.subtitle}>Private DeFi Trading Platform</Text>
       
       <View style={styles.features}>

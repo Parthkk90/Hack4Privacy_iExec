@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'PrivateAlpha Backend API',
+    service: 'PUREIS  Backend API',
     version: '1.0.0'
   });
 });
@@ -50,7 +50,7 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 PrivateAlpha Backend API running on port ${PORT}`);
+  console.log(`🚀 PUREIS  Backend API running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
 });

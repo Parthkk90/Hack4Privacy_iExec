@@ -1,10 +1,10 @@
-use privatealpha_tee::{find_momentum_signals, PriceData};
+use PUREIS _tee::{find_momentum_signals, PriceData};
 use std::collections::HashMap;
 use std::env;
 use std::fs;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("📈 PrivateAlpha Strategy Executor - TEE Worker");
+    println!("📈 PUREIS  Strategy Executor - TEE Worker");
     println!("Running in secure enclave...\n");
 
     // Parse arguments

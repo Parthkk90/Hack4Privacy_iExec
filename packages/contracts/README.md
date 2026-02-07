@@ -1,6 +1,6 @@
 # Smart Contracts Package
 
-Solidity smart contracts for the PrivateAlpha trading platform, deployed on Arbitrum Sepolia.
+Solidity smart contracts for the PUREIS  trading platform, deployed on Arbitrum Sepolia.
 
 ## Contracts
 

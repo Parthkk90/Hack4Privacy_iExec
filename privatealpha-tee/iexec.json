@@ -1,15 +1,15 @@
 {
-  "description": "PrivateAlpha TEE Worker - Credit Scoring and Strategy Execution",
+  "description": "PUREIS  TEE Worker - Credit Scoring and Strategy Execution",
   "license": "MIT",
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "social": {
-    "website": "https://privatealpha.io"
+    "website": "https://PUREIS .io"
   },
   "app": {
     "owner": "0xYourWalletAddress",
-    "name": "privatealpha-worker",
+    "name": "PUREIS -worker",
     "type": "DOCKER",
-    "multiaddr": "registry.hub.docker.com/yourusername/privatealpha-tee:latest",
+    "multiaddr": "registry.hub.docker.com/yourusername/PUREIS -tee:latest",
     "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "mrenclave": {
       "framework": "SCONE",

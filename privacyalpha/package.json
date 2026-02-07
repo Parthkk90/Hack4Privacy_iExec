@@ -1,5 +1,5 @@
 {
-  "name": "privatealpha-iapp",
+  "name": "PUREIS -iapp",
   "version": "1.0.0",
   "description": "Confidential DeFi Analytics - Credit Scoring, Trading Signals, Arbitrage Detection, Risk Analysis",
   "main": "src/app.js",
@@ -24,7 +24,7 @@
     "privacy",
     "blockchain"
   ],
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "license": "MIT",
   "dependencies": {
     "@iexec/dataprotector-deserializer": "^0.1.1"

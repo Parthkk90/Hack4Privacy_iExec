@@ -1,4 +1,4 @@
-# PrivateAlpha - Confidential DeFi Analytics iApp
+# PUREIS  - Confidential DeFi Analytics iApp
 
 > **Privacy-first financial intelligence platform powered by iExec TEE**
 
@@ -7,7 +7,7 @@
 
 ## Overview
 
-PrivateAlpha is a confidential computing application that provides sophisticated financial analytics while keeping user data completely private. All computations happen inside a Trusted Execution Environment (TEE) - your data is never exposed.
+PUREIS  is a confidential computing application that provides sophisticated financial analytics while keeping user data completely private. All computations happen inside a Trusted Execution Environment (TEE) - your data is never exposed.
 
 ### Features
 
@@ -32,7 +32,7 @@ PrivateAlpha is a confidential computing application that provides sophisticated
 
 ```bash
 # Navigate to project
-cd privacyalpha
+cd PUREIS 
 
 # Install dependencies
 npm install
@@ -183,7 +183,7 @@ iapp run <address> --args credit-score --protectedData user1 user2 user3
 ## Project Structure
 
 ```
-privacyalpha/
+PUREIS /
 ├── src/
 │   ├── app.js                 # Main entry point
 │   └── utils/

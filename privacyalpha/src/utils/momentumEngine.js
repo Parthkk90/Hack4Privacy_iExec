@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha Momentum Engine
+ * PUREIS  Momentum Engine
  * AI-powered trading signal generation using momentum strategies
  * All computations happen inside the TEE - strategies remain private
  */

@@ -707,7 +707,7 @@ app.post('/api/compute-credit-score', async (req, res) => {
       mode: 'live',
       tee_deployed: iexecReady,
       tee_app_address: appAddress || 'not configured',
-      docker_image: 'parthkk/privacyalpha:0.0.1-tee-scone-5.9.1-v16-prod',
+      docker_image: 'parthkk/PUREIS :0.0.1-tee-scone-5.9.1-v16-prod',
       network: 'Bellecour',
       note: 'Credit score computed from LIVE blockchain data',
       score: scoreResult.score,

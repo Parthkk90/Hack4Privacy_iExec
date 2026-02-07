@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-  console.log("🚀 Deploying PrivateAlpha contracts to", hre.network.name);
+  console.log("🚀 Deploying PUREIS  contracts to", hre.network.name);
   console.log("=".repeat(60));
 
   const [deployer] = await hre.ethers.getSigners();

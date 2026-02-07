@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha Credit Scorer
+ * PUREIS  Credit Scorer
  * Calculates private credit scores based on on-chain trading history
  * All computations happen inside the TEE - data never exposed
  */

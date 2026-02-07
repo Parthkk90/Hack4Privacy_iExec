@@ -1,7 +1,7 @@
 {
   "name": "backend-standalone",
   "version": "1.0.0",
-  "description": "Backend API for PrivateAlpha trading platform",
+  "description": "Backend API for PUREIS  trading platform",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -15,7 +15,7 @@
     "blockchain",
     "defi"
   ],
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.5",

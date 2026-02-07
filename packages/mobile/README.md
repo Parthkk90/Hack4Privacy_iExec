@@ -1,6 +1,6 @@
 # Mobile App Package
 
-React Native mobile application for PrivateAlpha trading platform.
+React Native mobile application for PUREIS  trading platform.
 
 ## Features
 

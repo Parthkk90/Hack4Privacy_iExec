@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha Arbitrage Scanner
+ * PUREIS  Arbitrage Scanner
  * Detects cross-DEX and cross-chain arbitrage opportunities
  * All computations happen inside the TEE - opportunities remain private
  */

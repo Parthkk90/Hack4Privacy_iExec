@@ -1,5 +1,5 @@
 /**
- * PrivateAlpha Bulk Processor
+ * PUREIS  Bulk Processor
  * Efficiently process multiple protected data items in a single TEE execution
  * Designed for iExec's bulk processing bonus prize
  */

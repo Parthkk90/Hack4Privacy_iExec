@@ -1,4 +1,4 @@
-# 🔐 PrivacyAlpha - AI-Powered Private Trading on iExec TEE
+# 🔐 PUREIS  - AI-Powered Private Trading on iExec TEE
 
 <p align="center">
   <img src="https://img.shields.io/badge/Blockchain-Arbitrum%20Sepolia-blue" alt="Arbitrum"/>
@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="MIT"/>
 </p>
 
-**PrivacyAlpha** is a privacy-preserving DeFi trading platform that leverages **iExec Trusted Execution Environment (TEE)** to execute AI-driven trading strategies with complete confidentiality. Your trading algorithms and positions are never exposed to the public blockchain.
+**PUREIS ** is a privacy-preserving DeFi trading platform that leverages **iExec Trusted Execution Environment (TEE)** to execute AI-driven trading strategies with complete confidentiality. Your trading algorithms and positions are never exposed to the public blockchain.
 
 ---
 
@@ -15,7 +15,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           PRIVACYALPHA SYSTEM                               │
+│                           PUREIS  SYSTEM                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────────────┐  │
@@ -294,7 +294,7 @@ Tier System:
 ### MEV Protection
 
 ```
-Traditional Trade:              PrivacyAlpha Trade:
+Traditional Trade:              PUREIS  Trade:
                                 
 Mempool ──▶ Frontrunner ──▶ TX  TEE ──▶ Direct to Block
     │           │                      (No mempool exposure)
@@ -318,8 +318,8 @@ Mempool ──▶ Frontrunner ──▶ TX  TEE ──▶ Direct to Block
 
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/privacyalpha.git
-cd privacyalpha/hack4privacy
+git clone https://github.com/your-repo/PUREIS .git
+cd PUREIS /hack4privacy
 
 # Install dependencies
 cd backend && npm install
@@ -367,7 +367,7 @@ hack4privacy/
 │   ├── StrategyExecutor.sol
 │   ├── CreditScoreRegistry.sol
 │   └── FlashbotsRelayer.sol
-└── privacyalpha/               # TEE Worker (Rust)
+└── PUREIS /               # TEE Worker (Rust)
     └── src/
         ├── credit_scorer.rs
         └── strategy_executor.rs

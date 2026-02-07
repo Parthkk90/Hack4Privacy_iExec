@@ -1,9 +1,9 @@
-use privatealpha_tee::{CreditScoreInput, compute_credit_score};
+use PUREIS _tee::{CreditScoreInput, compute_credit_score};
 use std::env;
 use std::fs;
 
 fn main() {
-    println!("🔒 PrivateAlpha Credit Scorer - TEE Worker");
+    println!("🔒 PUREIS  Credit Scorer - TEE Worker");
     println!("==========================================");
 
     // Get input file from args or use default

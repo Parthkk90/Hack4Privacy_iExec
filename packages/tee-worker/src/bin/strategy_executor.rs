@@ -1,9 +1,9 @@
-use privatealpha_tee::{TradingSignalInput, generate_trading_signal};
+use PUREIS _tee::{TradingSignalInput, generate_trading_signal};
 use std::env;
 use std::fs;
 
 fn main() {
-    println!("📊 PrivateAlpha Strategy Executor - TEE Worker");
+    println!("📊 PUREIS  Strategy Executor - TEE Worker");
     println!("=============================================");
 
     // Get input file from args or use default

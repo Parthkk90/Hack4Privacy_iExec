@@ -1,9 +1,9 @@
 {
-  "description": "PrivateAlpha TEE Worker - Private Credit Scoring & Trading Signals",
+  "description": "PUREIS  TEE Worker - Private Credit Scoring & Trading Signals",
   "license": "MIT",
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "social": {
-    "github": "https://github.com/yourusername/privatealpha"
+    "github": "https://github.com/yourusername/PUREIS "
   },
   "logo": {
     "file": "logo.png"
@@ -18,9 +18,9 @@
   },
   "app": {
     "owner": "0xYOUR_WALLET_ADDRESS",
-    "name": "privatealpha-tee",
+    "name": "PUREIS -tee",
     "type": "DOCKER",
-    "multiaddr": "registry.hub.docker.com/yourusername/privatealpha-tee:latest",
+    "multiaddr": "registry.hub.docker.com/yourusername/PUREIS -tee:latest",
     "checksum": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "mrenclave": {
       "framework": "SCONE",

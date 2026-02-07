@@ -1,33 +1,34 @@
 {
   "expo": {
-    "name": "PrivateAlpha",
-    "slug": "privatealpha",
+    "name": "PUREIS ",
+    "slug": "PUREIS ",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "scheme": "privatealpha",
+    "userInterfaceStyle": "light",
+    "scheme": "PUREIS ",
     "sdkVersion": "51.0.0",
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a2e"
+      "backgroundColor": "#f8f9fa"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.privatealpha.app"
+      "bundleIdentifier": "com.PUREIS .app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#1a1a2e"
+        "backgroundColor": "#f8f9fa"
       },
-      "package": "com.privatealpha.app",
-      "permissions": []
+      "package": "com.PUREIS .app",
+      "permissions": [],
+      "softwareKeyboardLayoutMode": "pan"
     },
     "extra": {
       "eas": {
-        "projectId": "privatealpha"
+        "projectId": "PUREIS "
       }
     },
     "plugins": []
