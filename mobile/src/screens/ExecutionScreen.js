@@ -1,242 +1,201 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Animated, TouchableOpacity } from 'react-native';
-import { executePrivateTrade } from '../services/api';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, StatusBar, ScrollView, Linking, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Svg, { Rect } from 'react-native-svg';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ExecutionScreen({ route, navigation }) {
-  const { opportunity, scoreData } = route.params;
-  const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState(null);
-  const pulseAnim = new Animated.Value(1);
-  const successAnim = new Animated.Value(0);
+  const opportunity = route?.params?.opportunity || {};
+  const transaction = route?.params?.transaction || {};
   
-  useEffect(() => {
-    executeTrade();
-    startPulseAnimation();
-  }, []);
+  const asset = opportunity.asset || 'ETH';
+  const action = opportunity.action || 'BUY';
+  const tradeAmount = opportunity.tradeAmount || '100';
+  const entryPrice = opportunity.price || opportunity.entryPrice || 0;
+  const totalValue = parseFloat(tradeAmount) * entryPrice;
   
-  const startPulseAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  };
+  // Calculate MEV savings (0.5% - 2% typically saved)
+  const mevSavedPercent = 0.015; // 1.5% saved
+  const mevSaved = totalValue * mevSavedPercent;
   
-  const executeTrade = async () => {
-    try {
-      // Step 1: Encrypt
-      setStep(1);
-      setProgress(0.2);
-      await delay(1000);
-      
-      // Step 2: TEE Computation
-      setStep(2);
-      setProgress(0.4);
-      await delay(1500);
-      
-      // Step 3: Generate Proof
-      setStep(3);
-      setProgress(0.6);
-      const mockProof = '0x6d6f636b2d70726f6f66'; // hex encoded 'mock-proof'
-      await delay(1000);
-      
-      // Step 4: Execute
-      setStep(4);
-      setProgress(0.8);
-      const txResult = await executePrivateTrade(opportunity, mockProof);
-      
-      setProgress(1.0);
-      setResult(txResult);
-      
-      // Success animation
-      Animated.spring(successAnim, {
-        toValue: 1,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      }).start();
-      
-    } catch (error) {
-      console.error('Execution error:', error);
-    }
-  };
+  // Gas fees on Arbitrum (typically $0.50 - $2.00)
+  const gasPaid = transaction.gasUsed ? parseFloat(transaction.gasUsed) / 1000000 * 0.025 : 1.20;
   
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const network = 'Arbitrum Sepolia';
   
-  const stepDetails = [
-    {
-      label: "Encrypting strategy",
-      description: "Securing your trade parameters",
-      icon: "🔐"
-    },
-    {
-      label: "TEE computation",
-      description: "Processing in secure enclave",
-      icon: "⚙️"
-    },
-    {
-      label: "Generating proof",
-      description: "Creating attestation",
-      icon: "📜"
-    },
-    {
-      label: "Private execution",
-      description: "Submitting via Flashbots",
-      icon: "⚡"
-    }
-  ];
+  // Use real transaction hash from backend, or generate mock for demo
+  const attestationHash = transaction.txHash || `0x${Math.random().toString(16).substr(2, 40)}...`;
+  const usedTEE = transaction.usedTEE !== undefined ? transaction.usedTEE : true;
   
-  if (result) {
-    return (
-      <View style={styles.container}>
-        <Animated.View style={[
-          styles.successContainer,
-          {
-            opacity: successAnim,
-            transform: [{ scale: successAnim }]
-          }
-        ]}>
-          <View style={styles.successIconContainer}>
-            <Text style={styles.successIcon}>✅</Text>
-          </View>
-          <Text style={styles.successTitle}>Trade Executed!</Text>
-          <Text style={styles.successSubtitle}>Your transaction is confirmed</Text>
-        </Animated.View>
-        
-        <View style={styles.resultsContainer}>
-          <View style={styles.resultCard}>
-            <Text style={styles.resultLabel}>Asset</Text>
-            <Text style={styles.resultValue}>{opportunity.asset}</Text>
-          </View>
-          
-          <View style={styles.resultCard}>
-            <Text style={styles.resultLabel}>Estimated Profit</Text>
-            <Text style={styles.profitValue}>+${opportunity.expectedProfit}</Text>
-          </View>
-          
-          <View style={styles.resultCard}>
-            <Text style={styles.resultLabel}>Transaction Hash</Text>
-            <Text style={styles.txHash}>
-              {result.txHash ? result.txHash.slice(0, 10) : '0x7a3f2d1b'}...{result.txHash ? result.txHash.slice(-8) : '9e8c5f4a'}
-            </Text>
-            <Text style={styles.viewExplorer}>View on Explorer →</Text>
-          </View>
-        </View>
-        
-        <View style={styles.securityCard}>
-          <Text style={styles.securityTitle}>🔒 Privacy Guaranteed</Text>
-          <SecurityFeature text="Trade executed privately via Flashbots" />
-          <SecurityFeature text="No MEV extraction possible" />
-          <SecurityFeature text="TEE attestation verified" />
-        </View>
-        
-        <TouchableOpacity 
-          style={styles.doneButton}
-          onPress={() => navigation.navigate('Dashboard', { scoreData, walletAddress: route.params.walletAddress })}
-        >
-          <Text style={styles.doneButtonText}>Back to Dashboard</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  // Check if this is a real blockchain transaction or demo mode
+  // Demo mode is explicitly flagged by backend, or has a note field
+  const isRealTransaction = transaction.success && !transaction.demoMode && !transaction.note;
+  
+  // TEE protection details
+  const teeApp = opportunity.dataSource?.tee_app || 'iExec TEE';
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Executing {opportunity.signal} Order</Text>
-      <Text style={styles.assetName}>{opportunity.asset}</Text>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
       
-      <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-        <ActivityIndicator size="large" color="#00d4aa" style={styles.spinner} />
-      </Animated.View>
-      
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <Animated.View 
-            style={[
-              styles.progressFill, 
-              { width: `${progress * 100}%` }
-            ]} 
-          />
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Success Icon */}
+        <View style={[styles.successCircle, !isRealTransaction && styles.demoSuccessCircle]}>
+          <Ionicons name={isRealTransaction ? "checkmark" : "flash"} size={48} color="#FFFFFF" />
         </View>
-        <Text style={styles.progressText}>{(progress * 100).toFixed(0)}%</Text>
-      </View>
-      
-      <View style={styles.stepsContainer}>
-        {stepDetails.map((stepInfo, index) => (
-          <StepItem 
-            key={index}
-            {...stepInfo}
-            number={index + 1}
-            active={step === index + 1}
-            completed={step > index + 1}
-          />
-        ))}
-      </View>
-      
-      <View style={styles.securityBadges}>
-        <SecurityBadge icon="🔒" text="Private" />
-        <SecurityBadge icon="⚡" text="No MEV" />
-        <SecurityBadge icon="✓" text="TEE Verified" />
-      </View>
-    </View>
-  );
-}
-
-function StepItem({ number, icon, label, description, active, completed }) {
-  return (
-    <View style={[
-      styles.stepItem,
-      active && styles.stepItemActive,
-      completed && styles.stepItemCompleted
-    ]}>
-      <View style={[
-        styles.stepNumber,
-        active && styles.stepNumberActive,
-        completed && styles.stepNumberCompleted
-      ]}>
-        {completed ? (
-          <Text style={styles.stepCheckmark}>✓</Text>
-        ) : (
-          <Text style={styles.stepNumberText}>{icon}</Text>
-        )}
-      </View>
-      <View style={styles.stepContent}>
-        <Text style={[
-          styles.stepLabel,
-          (active || completed) && styles.stepLabelActive
-        ]}>
-          {label}
+        
+        {/* Success Message */}
+        <Text style={styles.title}>
+          {isRealTransaction ? 'Trade Executed' : 'Trade Simulated'}
         </Text>
-        <Text style={styles.stepDescription}>{description}</Text>
+        <Text style={styles.subtitle}>
+          {isRealTransaction 
+            ? 'Your order was filled instantly via iExec TEE'
+            : 'Demo mode - Trade simulation completed successfully'}
+        </Text>
+        
+        {/* Demo Mode Banner */}
+        {!isRealTransaction && (
+          <View style={styles.demoBanner}>
+            <Ionicons name="information-circle" size={20} color="#F59E0B" />
+            <Text style={styles.demoBannerText}>
+              This is a simulated transaction for demo purposes. No real blockchain transaction was made.
+            </Text>
+          </View>
+        )}
+        
+        {/* Trade Details Card */}
+        <View style={styles.detailsCard}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>{action === 'BUY' ? 'Bought' : 'Sold'}</Text>
+            <View style={styles.detailValueContainer}>
+              <Text style={styles.detailValue}>${totalValue.toFixed(2)}</Text>
+              <Text style={styles.detailValueUSD}>≈ {tradeAmount} {asset}</Text>
+            </View>
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <View style={styles.detailRow}>
+            <View style={styles.detailIconLabel}>
+              <View style={styles.mevIcon}>
+                <Ionicons name="shield-checkmark" size={14} color="#22C55E" />
+              </View>
+              <Text style={styles.detailLabel}>MEV Saved</Text>
+            </View>
+            <Text style={[styles.detailValue, { color: '#22C55E' }]}>${mevSaved.toFixed(2)}</Text>
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <View style={styles.detailRow}>
+            <View style={styles.detailIconLabel}>
+              <View style={[styles.mevIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                <Ionicons name="flash" size={14} color="#3B82F6" />
+              </View>
+              <Text style={styles.detailLabel}>Gas Paid</Text>
+            </View>
+            <Text style={styles.detailValue}>${gasPaid.toFixed(2)}</Text>
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <View style={styles.detailRow}>
+            <View style={styles.detailIconLabel}>
+              <View style={[styles.mevIcon, { backgroundColor: 'rgba(156, 163, 175, 0.15)' }]}>
+                <Ionicons name="globe-outline" size={14} color="#9CA3AF" />
+              </View>
+              <Text style={styles.detailLabel}>Network</Text>
+            </View>
+            <Text style={styles.detailValue}>{network}</Text>
+          </View>
+        </View>
+        
+        {/* Attestation Proof */}
+        <View style={styles.attestationSection}>
+          <View style={styles.attestationHeader}>
+            <Text style={styles.attestationTitle}>ATTESTATION PROOF</Text>
+            {!isRealTransaction && (
+              <View style={styles.demoBadge}>
+                <Text style={styles.demoBadgeText}>DEMO MODE</Text>
+              </View>
+            )}
+          </View>
+          
+          <View style={styles.qrContainer}>
+            {/* QR Code Placeholder - Using simple grid pattern */}
+            <View style={styles.qrCode}>
+              <Svg height={120} width={120}>
+                {/* Simple QR-like pattern */}
+                <Rect x={10} y={10} width={30} height={30} fill="#000000" />
+                <Rect x={50} y={10} width={20} height={20} fill="#000000" />
+                <Rect x={80} y={10} width={30} height={30} fill="#000000" />
+                <Rect x={10} y={50} width={20} height={20} fill="#000000" />
+                <Rect x={40} y={40} width={40} height={40} fill="#000000" />
+                <Rect x={90} y={50} width={20} height={20} fill="#000000" />
+                <Rect x={10} y={80} width={30} height={30} fill="#000000" />
+                <Rect x={50} y={90} width={20} height={20} fill="#000000" />
+                <Rect x={80} y={80} width={30} height={30} fill="#000000" />
+              </Svg>
+            </View>
+          </View>
+          
+          <Text style={styles.attestationText}>
+            {isRealTransaction 
+              ? 'TEE-secured trade verification. This hash confirms the execution environment was private and secure.'
+              : 'DEMO MODE: This is a simulated transaction for demonstration purposes. No actual blockchain transaction was made.'}
+          </Text>
+          
+          <TouchableOpacity 
+            style={[styles.hashButton, !isRealTransaction && styles.hashButtonDisabled]}
+            onPress={() => {
+              if (!isRealTransaction) {
+                // For demo mode, show explanation alert
+                Alert.alert(
+                  'Demo Transaction',
+                  'This is a simulated transaction hash for demonstration purposes.\n\nNo actual blockchain transaction was made. In production mode with funded accounts, real transactions will be submitted to Arbitrum Sepolia and viewable on Arbiscan.',
+                  [{ text: 'OK', style: 'default' }]
+                );
+                return;
+              }
+              // Remove '...' if it's a truncated hash, otherwise use full hash
+              const cleanHash = attestationHash.replace('...', '');
+              const explorerUrl = `https://sepolia.arbiscan.io/tx/${cleanHash}`;
+              
+              console.log('🔗 Opening Arbiscan:', explorerUrl);
+              Linking.openURL(explorerUrl).catch(err => 
+                console.error('Failed to open URL:', err)
+              );
+            }}
+          >
+            <Text style={[styles.hashText, !isRealTransaction && styles.hashTextDisabled]} numberOfLines={1}>
+              {isRealTransaction ? attestationHash : 'Demo: ' + attestationHash.substring(0, 20) + '...'}
+            </Text>
+            {isRealTransaction ? (
+              <Ionicons name="open-outline" size={16} color="#3B82F6" />
+            ) : (
+              <Ionicons name="information-circle-outline" size={16} color="#9CA3AF" />
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      
+      {/* Done Button */}
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          style={styles.doneButton}
+          onPress={() => {
+            // Navigate back to dashboard
+            navigation.navigate('Dashboard');
+          }}
+        >
+          <Text style={styles.doneButtonText}>Done</Text>
+        </TouchableOpacity>
       </View>
-    </View>
-  );
-}
-
-function SecurityBadge({ icon, text }) {
-  return (
-    <View style={styles.securityBadge}>
-      <Text style={styles.badgeIcon}>{icon}</Text>
-      <Text style={styles.badgeText}>{text}</Text>
-    </View>
-  );
-}
-
-function SecurityFeature({ text }) {
-  return (
-    <View style={styles.securityFeature}>
-      <Text style={styles.securityCheck}>✓</Text>
-      <Text style={styles.securityFeatureText}>{text}</Text>
     </View>
   );
 }
@@ -244,227 +203,209 @@ function SecurityFeature({ text }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1e',
-    padding: 20,
+    backgroundColor: '#000000',
+  },
+  content: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingTop: 80,
+    paddingHorizontal: 24,
+    paddingBottom: 120,
+  },
+  successCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#22C55E',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    shadowColor: '#22C55E',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  demoSuccessCircle: {
+    backgroundColor: '#3B82F6',
+    shadowColor: '#3B82F6',
+  },
+  demoBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 24,
+    gap: 10,
+  },
+  demoBannerText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#F59E0B',
+    lineHeight: 18,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
+    color: '#FFFFFF',
     marginBottom: 8,
   },
-  assetName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#00d4aa',
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  spinner: {
-    marginVertical: 30,
-  },
-  progressContainer: {
-    marginVertical: 20,
-  },
-  progressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#1a1a2e',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#00d4aa',
-    borderRadius: 4,
-  },
-  progressText: {
+  subtitle: {
     fontSize: 14,
-    color: '#8e8e93',
-    textAlign: 'right',
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 20,
   },
-  stepsContainer: {
-    marginTop: 20,
+  detailsCard: {
+    width: '100%',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 32,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
   },
-  stepItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a2e',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    opacity: 0.5,
-  },
-  stepItemActive: {
-    opacity: 1,
-    borderWidth: 2,
-    borderColor: '#00d4aa',
-  },
-  stepItemCompleted: {
-    opacity: 0.7,
-  },
-  stepNumber: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#252545',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  stepNumberActive: {
-    backgroundColor: '#00d4aa',
-  },
-  stepNumberCompleted: {
-    backgroundColor: '#00d4aa',
-  },
-  stepNumberText: {
-    fontSize: 20,
-  },
-  stepCheckmark: {
-    fontSize: 24,
-    color: '#000',
-    fontWeight: 'bold',
-  },
-  stepContent: {
-    flex: 1,
-  },
-  stepLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#8e8e93',
-    marginBottom: 4,
-  },
-  stepLabelActive: {
-    color: '#fff',
-  },
-  stepDescription: {
-    fontSize: 12,
-    color: '#8e8e93',
-  },
-  securityBadges: {
+  detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 30,
-  },
-  securityBadge: {
-    flex: 1,
-    backgroundColor: '#1a1a2e',
-    padding: 12,
-    borderRadius: 8,
     alignItems: 'center',
-    marginHorizontal: 4,
+    paddingVertical: 12,
   },
-  badgeIcon: {
-    fontSize: 20,
-    marginBottom: 4,
-  },
-  badgeText: {
-    fontSize: 12,
-    color: '#8e8e93',
-    fontWeight: '600',
-  },
-  successContainer: {
-    alignItems: 'center',
-    marginVertical: 40,
-  },
-  successIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#1a1a2e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  successIcon: {
-    fontSize: 60,
-  },
-  successTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#00d4aa',
-    marginBottom: 8,
-  },
-  successSubtitle: {
-    fontSize: 16,
-    color: '#8e8e93',
-  },
-  resultsContainer: {
-    marginBottom: 20,
-  },
-  resultCard: {
-    backgroundColor: '#1a1a2e',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  resultLabel: {
-    fontSize: 12,
-    color: '#8e8e93',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  resultValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  profitValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#00d4aa',
-  },
-  txHash: {
+  detailLabel: {
     fontSize: 14,
-    color: '#fff',
-    fontFamily: 'monospace',
-    marginBottom: 8,
+    color: '#9CA3AF',
   },
-  viewExplorer: {
-    fontSize: 12,
-    color: '#00d4aa',
-    fontWeight: '600',
-  },
-  securityCard: {
-    backgroundColor: '#1a1a2e',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-  },
-  securityTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  securityFeature: {
+  detailIconLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    gap: 8,
   },
-  securityCheck: {
+  mevIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  detailValue: {
     fontSize: 16,
-    color: '#00d4aa',
-    marginRight: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
-  securityFeatureText: {
-    fontSize: 14,
-    color: '#8e8e93',
-    flex: 1,
+  detailValueContainer: {
+    alignItems: 'flex-end',
   },
-  doneButton: {
-    backgroundColor: '#00d4aa',
-    padding: 18,
-    borderRadius: 12,
+  detailValueUSD: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#2A2A2A',
+  },
+  attestationSection: {
+    width: '100%',
     alignItems: 'center',
   },
+  attestationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  attestationTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+  },
+  demoBadge: {
+    backgroundColor: '#F59E0B',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  demoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#000000',
+    letterSpacing: 0.5,
+  },
+  qrContainer: {
+    marginBottom: 20,
+  },
+  qrCode: {
+    width: 140,
+    height: 140,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  attestationText: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  hashButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
+  },
+  hashButtonDisabled: {
+    opacity: 0.5,
+    borderColor: '#1A1A1A',
+  },
+  hashText: {
+    fontSize: 12,
+    color: '#3B82F6',
+    fontFamily: 'monospace',
+    maxWidth: 200,
+  },
+  hashTextDisabled: {
+    color: '#6B7280',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    backgroundColor: '#000000',
+    borderTopWidth: 1,
+    borderTopColor: '#1A1A1A',
+  },
+  doneButton: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   doneButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

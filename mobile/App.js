@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Platform, ActivityIndicator, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import screens
 import WelcomeScreen from './src/screens/WelcomeScreen';
@@ -17,38 +19,8 @@ import SettingsScreen from './src/screens/SettingsScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Custom Tab Bar Button for center action
-function CustomTabBarButton({ children, onPress }) {
-  return (
-    <TouchableOpacity
-      style={{
-        top: -20,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-      onPress={onPress}
-    >
-      <View style={{
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#00d4aa',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#00d4aa',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-      }}>
-        {children}
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-// Tab Navigator with 5 tabs
-function MainTabs({ route }) {
+// Tab Navigator with 4 tabs
+function MainTabs({ route, navigation }) {
   const { scoreData, walletAddress } = route.params || {};
   
   return (
@@ -61,22 +33,22 @@ function MainTabs({ route }) {
           left: 0,
           right: 0,
           elevation: 0,
-          backgroundColor: '#1a1a2e',
-          borderTopColor: '#252545',
+          backgroundColor: '#000000',
+          borderTopColor: '#1A1A1A',
           borderTopWidth: 1,
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
+          height: Platform.OS === 'android' ? 65 : 70,
+          paddingBottom: Platform.OS === 'android' ? 8 : 12,
+          paddingTop: 8,
         },
-        tabBarActiveTintColor: '#00d4aa',
-        tabBarInactiveTintColor: '#8e8e93',
+        tabBarActiveTintColor: '#2563EB',
+        tabBarInactiveTintColor: '#6B7280',
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: '500',
           marginTop: 4,
         },
         tabBarIconStyle: {
-          marginTop: 5,
+          marginTop: 2,
         },
       }}
     >
@@ -86,46 +58,41 @@ function MainTabs({ route }) {
         initialParams={{ scoreData, walletAddress }}
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <View style={styles.iconContainer}>
-              <Text style={[styles.icon, { color, fontSize: focused ? 26 : 24 }]}>🏠</Text>
-            </View>
+            <Ionicons 
+              name={focused ? "home" : "home-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
         }}
       />
       
       <Tab.Screen 
         name="Markets" 
-        component={PortfolioScreen}
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <View style={styles.iconContainer}>
-              <Text style={[styles.icon, { color, fontSize: focused ? 26 : 24 }]}>📊</Text>
-            </View>
-          ),
-        }}
-      />
-      
-      <Tab.Screen 
-        name="Trade" 
-        component={DashboardScreen}
+        component={StrategyScreen}
         initialParams={{ scoreData, walletAddress }}
         options={{
-          tabBarLabel: '',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 28, color: '#000' }}>⚡</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={focused ? "analytics" : "analytics-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
-          tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
       />
       
       <Tab.Screen 
-        name="Portfolio" 
-        component={PortfolioScreen}
+        name="Score" 
+        component={CreditScoreScreen}
+        initialParams={{ walletAddress }}
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <View style={styles.iconContainer}>
-              <Text style={[styles.icon, { color, fontSize: focused ? 26 : 24 }]}>💼</Text>
-            </View>
+            <Ionicons 
+              name={focused ? "bar-chart" : "bar-chart-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
         }}
       />
@@ -133,11 +100,14 @@ function MainTabs({ route }) {
       <Tab.Screen 
         name="Profile" 
         component={SettingsScreen}
+        initialParams={{ walletAddress }}
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <View style={styles.iconContainer}>
-              <Text style={[styles.icon, { color, fontSize: focused ? 26 : 24 }]}>👤</Text>
-            </View>
+            <Ionicons 
+              name={focused ? "person" : "person-outline"} 
+              size={24} 
+              color={color} 
+            />
           ),
         }}
       />
@@ -146,25 +116,71 @@ function MainTabs({ route }) {
 }
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('Welcome');
+  const [initialParams, setInitialParams] = useState({});
+
+  useEffect(() => {
+    checkWalletConnection();
+  }, []);
+
+  const checkWalletConnection = async () => {
+    try {
+      const savedWallet = await AsyncStorage.getItem('walletAddress');
+      console.log('Checking saved wallet:', savedWallet);
+      
+      // Always show Welcome screen first for demo/submission
+      setInitialRoute('Welcome');
+      if (savedWallet) {
+        setInitialParams({ walletAddress: savedWallet });
+        console.log('Wallet found in storage, will auto-connect');
+      } else {
+        console.log('No saved wallet, showing Welcome screen');
+      }
+    } catch (error) {
+      console.error('Error loading wallet:', error);
+      setInitialRoute('Welcome');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+        <ActivityIndicator size="large" color="#2196F3" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Stack.Navigator
-        initialRouteName="Welcome"
+        initialRouteName={initialRoute}
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#0f0f1e',
+            backgroundColor: '#f8f9fa',
           },
-          headerTintColor: '#fff',
+          headerTintColor: '#000',
           headerTitleStyle: {
             fontWeight: 'bold',
           },
           headerShadowVisible: false,
           contentStyle: {
-            backgroundColor: '#0f0f1e',
+            backgroundColor: '#f8f9fa',
           },
         }}
       >
+        <Stack.Screen 
+          name="Dashboard" 
+          component={MainTabs}
+          initialParams={initialParams}
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
         <Stack.Screen 
           name="Welcome" 
           component={WelcomeScreen}
@@ -179,19 +195,10 @@ export default function App() {
           }}
         />
         <Stack.Screen 
-          name="Dashboard" 
-          component={MainTabs}
-          options={{ 
-            headerShown: false,
-            gestureEnabled: false,
-          }}
-        />
-        <Stack.Screen 
           name="Strategy" 
           component={StrategyScreen}
           options={{ 
-            title: 'Strategy Details',
-            headerBackTitle: 'Back'
+            headerShown: false,
           }}
         />
         <Stack.Screen 
@@ -206,13 +213,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  icon: {
-    textAlign: 'center',
-  },
-});

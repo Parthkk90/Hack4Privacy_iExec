@@ -1,7 +1,7 @@
 {
-  "name": "privatealpha-monorepo",
+  "name": "PUREIS -monorepo",
   "version": "1.0.0",
-  "description": "PrivateAlpha - Decentralized Private Trading Platform",
+  "description": "PUREIS  - Decentralized Private Trading Platform",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/privatealpha.git"
+    "url": "https://github.com/yourusername/PUREIS .git"
   },
   "keywords": [
     "defi",
@@ -42,6 +42,6 @@
     "privacy",
     "blockchain"
   ],
-  "author": "PrivateAlpha Team",
+  "author": "PUREIS  Team",
   "license": "MIT"
 }

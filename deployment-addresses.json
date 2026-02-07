@@ -1,0 +1,11 @@
+{
+  "network": "arbitrumSepolia",
+  "chainId": 421614,
+  "deployer": "0xBf8E022195f387dB0C28C741d1A7b1BeD1144B3C",
+  "contracts": {
+    "CreditScoreRegistry": "0x303521288Eb31C39c97CeDDb7aF1e593416EcAe8",
+    "StrategyExecutor": "0x31986c5cb319b3519a863353b5d61eDC7327405c",
+    "FlashbotsRelayer": "0xc80213B2920f20F8B0B2Dafd8D08703d0f23fbAE"
+  },
+  "timestamp": "2026-02-07T04:20:38.390Z"
+}

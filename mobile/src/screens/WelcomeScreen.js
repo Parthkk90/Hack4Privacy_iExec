@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
-import WalletConnector from '../components/WalletConnector';
+import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen({ navigation }) {
   const [walletAddress, setWalletAddress] = useState(null);
   const fadeAnim = new Animated.Value(0);
-  const slideAnim = new Animated.Value(50);
+  const scaleAnim = new Animated.Value(0.8);
+  const glowAnim = new Animated.Value(0);
   
   useEffect(() => {
     Animated.parallel([
@@ -16,115 +19,188 @@ export default function WelcomeScreen({ navigation }) {
         duration: 1000,
         useNativeDriver: true,
       }),
-      Animated.timing(slideAnim, {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    // Glow pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+  
+  const handleWalletConnected = async (address) => {
+    setWalletAddress(address);
+    
+    try {
+      await AsyncStorage.setItem('walletAddress', address);
+      console.log('Wallet address saved to storage:', address);
+    } catch (error) {
+      console.error('Failed to save wallet address:', error);
+    }
+    
+    setTimeout(() => {
+      navigation.navigate('Dashboard', { walletAddress: address });
+    }, 800);
+  };
+  
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.7],
+  });
+  
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo Section */}
+        <Animated.View 
+          style={[
+            styles.logoSection,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }]
+            }
+          ]}
+        >
+          <View style={styles.logoContainer}>
+            {/* Glow effect */}
+            <Animated.View style={[styles.logoGlow, { opacity: glowOpacity }]} />
+            <View style={styles.shieldBadge}>
+              <Ionicons name="shield-checkmark" size={48} color="#F59E0B" />
+            </View>
+          </View>
+          <Text style={styles.title}>PUREIS </Text>
+          <Text style={styles.subtitle}>Trade Smarter, Not Harder</Text>
+        </Animated.View>
+        
+        {/* Feature Cards */}
+        <View style={styles.featuresContainer}>
+          <FeatureCard 
+            icon="shield-check"
+            title="TEE-Protected"
+            subtitle="Secured by iExec TEE technology for total privacy."
+            delay={200}
+          />
+          <FeatureCard 
+            icon="bank"
+            title="On-Chain Credit"
+            subtitle="Unlock capital efficiency with decentralized scores."
+            delay={400}
+          />
+          <FeatureCard 
+            icon="shield-alert"
+            title="MEV Protection"
+            subtitle="Advanced AI signals to shield your trades from bots."
+            delay={600}
+          />
+        </View>
+        
+        {/* Footer */}
+        <View style={styles.footer}>
+          {!walletAddress ? (
+            <>
+              <TouchableOpacity 
+                style={styles.connectButton}
+                onPress={() => {
+                  const testAddress = '0xBf8E022195f387dB0C28C741d1A7b1BeD1144B3C';
+                  handleWalletConnected(testAddress);
+                }}
+              >
+                <Text style={styles.connectButtonText}>Connect Wallet</Text>
+              </TouchableOpacity>
+              
+              <View style={styles.networkBadge}>
+                <View style={styles.networkDot} />
+                <Text style={styles.networkText}>ARBITRUM SEPOLIA</Text>
+              </View>
+              
+              <Text style={styles.termsText}>
+                By connecting, you agree to our Terms of Service and Privacy Policy.
+              </Text>
+            </>
+          ) : (
+            <View style={styles.connectedInfo}>
+              <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
+              <Text style={styles.connectedText}>Wallet Connected</Text>
+              <Text style={styles.addressText}>
+                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+function FeatureCard({ icon, title, subtitle, delay }) {
+  const fadeIn = new Animated.Value(0);
+  const slideUp = new Animated.Value(30);
+  
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeIn, {
+        toValue: 1,
+        duration: 600,
+        delay: delay || 0,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUp, {
         toValue: 0,
-        duration: 800,
+        duration: 600,
+        delay: delay || 0,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
   
-  const handleWalletConnected = (address) => {
-    setWalletAddress(address);
-    // Navigate to credit score screen after brief delay
-    setTimeout(() => {
-      navigation.navigate('CreditScore', { walletAddress: address });
-    }, 1000);
+  const getIconColor = () => {
+    if (icon === 'shield-check') return '#3B82F6';
+    if (icon === 'bank') return '#8B5CF6';
+    return '#10B981';
+  };
+  
+  const getIconBg = () => {
+    if (icon === 'shield-check') return 'rgba(59, 130, 246, 0.1)';
+    if (icon === 'bank') return 'rgba(139, 92, 246, 0.1)';
+    return 'rgba(16, 185, 129, 0.1)';
   };
   
   return (
-    <View style={styles.container}>
-      <Animated.View 
-        style={[
-          styles.header,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}
-      >
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoEmoji}>🔒</Text>
-          <View style={styles.logoGlow} />
-        </View>
-        <Text style={styles.title}>PrivateAlpha</Text>
-        <Text style={styles.subtitle}>
-          Trade smarter, not harder.{'\n'}
-          Your strategies stay private. Always.
-        </Text>
-        <View style={styles.statsRow}>
-          <StatBadge number="1,247" label="Trades Protected" />
-          <StatBadge number="$2.4M" label="MEV Saved" />
-        </View>
-      </Animated.View>
-      
-      <View style={styles.features}>
-        <FeatureItem icon="🎯" text="AI-powered trading signals" delay={200} />
-        <FeatureItem icon="🔐" text="TEE-protected computation" delay={300} />
-        <FeatureItem icon="⚡" text="MEV-resistant execution" delay={400} />
-        <FeatureItem icon="💳" text="On-chain credit scoring" delay={500} />
+    <Animated.View 
+      style={[
+        styles.featureCard, 
+        { 
+          opacity: fadeIn,
+          transform: [{ translateY: slideUp }]
+        }
+      ]}
+    >
+      <View style={[styles.featureIcon, { backgroundColor: getIconBg() }]}>
+        <MaterialCommunityIcons name={icon} size={28} color={getIconColor()} />
       </View>
-      
-      <View style={styles.connectionSection}>
-        {!walletAddress ? (
-          <WalletConnector onConnected={handleWalletConnected} />
-        ) : (
-          <Animated.View style={styles.connectedInfo}>
-            <Text style={styles.connectedText}>✓ Wallet Connected</Text>
-            <Text style={styles.addressText}>
-              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-            </Text>
-            <Text style={styles.proceedingText}>Proceeding to analysis...</Text>
-          </Animated.View>
-        )}
+      <View style={styles.featureContent}>
+        <Text style={styles.featureTitle}>{title}</Text>
+        <Text style={styles.featureSubtitle}>{subtitle}</Text>
       </View>
-      
-      <View style={styles.footer}>
-        <View style={styles.poweredBy}>
-          <Text style={styles.footerText}>Powered by</Text>
-          <View style={styles.partnerLogos}>
-            <Text style={styles.partnerText}>iExec</Text>
-            <Text style={styles.divider}>•</Text>
-            <Text style={styles.partnerText}>Arbitrum</Text>
-          </View>
-        </View>
-        <View style={styles.networkBadge}>
-          <View style={styles.networkDot} />
-          <Text style={styles.networkText}>Arbitrum Sepolia</Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function StatBadge({ number, label }) {
-  return (
-    <View style={styles.statBadge}>
-      <Text style={styles.statNumber}>{number}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function FeatureItem({ icon, text, delay }) {
-  const fadeIn = new Animated.Value(0);
-  
-  React.useEffect(() => {
-    Animated.timing(fadeIn, {
-      toValue: 1,
-      duration: 600,
-      delay: delay || 0,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-  
-  return (
-    <Animated.View style={[styles.featureItem, { opacity: fadeIn }]}>
-      <View style={styles.featureIconContainer}>
-        <Text style={styles.featureIcon}>{icon}</Text>
-      </View>
-      <Text style={styles.featureText}>{text}</Text>
-      <Text style={styles.checkmark}>✓</Text>
     </Animated.View>
   );
 }
@@ -132,173 +208,156 @@ function FeatureItem({ icon, text, delay }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1e',
-    paddingHorizontal: 20,
-    paddingTop: 60,
+    backgroundColor: '#000000',
   },
-  header: {
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  logoSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 60,
   },
   logoContainer: {
     position: 'relative',
-    marginBottom: 20,
-  },
-  logoEmoji: {
-    fontSize: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 32,
   },
   logoGlow: {
     position: 'absolute',
-    width: 100,
-    height: 100,
-    backgroundColor: '#00d4aa',
-    opacity: 0.1,
-    borderRadius: 50,
-    top: -10,
-    left: -10,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: '#F59E0B',
+    opacity: 0.3,
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 40,
+  },
+  shieldBadge: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
   },
   title: {
-    fontSize: 42,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#8e8e93',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 24,
+    color: '#9CA3AF',
+    letterSpacing: 0.3,
   },
-  statsRow: {
-    flexDirection: 'row',
+  featuresContainer: {
     gap: 16,
+    marginBottom: 60,
   },
-  statBadge: {
-    backgroundColor: '#1a1a2e',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: '#00d4aa',
-  },
-  statNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#00d4aa',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#8e8e93',
-    marginTop: 2,
-  },
-  features: {
-    marginBottom: 40,
-  },
-  featureItem: {
+  featureCard: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 20,
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    backgroundColor: '#1a1a2e',
-    padding: 16,
-    borderRadius: 12,
+    alignItems: 'flex-start',
+    gap: 16,
     borderWidth: 1,
-    borderColor: '#252545',
-  },
-  featureIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#252545',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+    borderColor: '#2A2A2A',
   },
   featureIcon: {
-    fontSize: 20,
-  },
-  featureText: {
-    fontSize: 15,
-    color: '#fff',
-    flex: 1,
-  },
-  checkmark: {
-    fontSize: 16,
-    color: '#00d4aa',
-  },
-  connectionSection: {
-    marginBottom: 40,
-  },
-  connectedInfo: {
-    backgroundColor: '#1a1a2e',
-    padding: 24,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#00d4aa',
+    justifyContent: 'center',
   },
-  connectedText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#00d4aa',
-    marginBottom: 8,
+  featureContent: {
+    flex: 1,
   },
-  addressText: {
-    fontSize: 14,
-    color: '#8e8e93',
-    fontFamily: 'monospace',
-    marginBottom: 12,
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
-  proceedingText: {
-    fontSize: 12,
-    color: '#fff',
-    fontStyle: 'italic',
+  featureSubtitle: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    lineHeight: 18,
   },
   footer: {
     alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 30,
+    gap: 20,
   },
-  poweredBy: {
+  connectButton: {
+    width: '100%',
+    backgroundColor: '#2563EB',
+    paddingVertical: 18,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  footerText: {
-    fontSize: 11,
-    color: '#8e8e93',
-    marginBottom: 4,
-  },
-  partnerLogos: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  partnerText: {
-    fontSize: 13,
-    color: '#fff',
+  connectButtonText: {
+    fontSize: 17,
     fontWeight: '600',
-  },
-  divider: {
-    color: '#8e8e93',
+    color: '#FFFFFF',
   },
   networkBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    gap: 6,
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   networkDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00d4aa',
+    backgroundColor: '#22C55E',
   },
   networkText: {
-    fontSize: 12,
-    color: '#00d4aa',
+    fontSize: 11,
     fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+  },
+  termsText: {
+    fontSize: 11,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 16,
+    paddingHorizontal: 20,
+  },
+  connectedInfo: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  connectedText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#22C55E',
+    marginTop: 8,
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    fontFamily: 'monospace',
   },
 });
